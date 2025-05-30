@@ -1,35 +1,39 @@
 export interface RouteStore {
-  save(url: string): void;
-  get(): string | null;
-  clear(): void;
+  save(url: string): Promise<void>;
+  get(): Promise<string | null>;
+  clear(): Promise<void>;
 }
 
 export class CookieRouteStore implements RouteStore {
   private cookieName: string;
-  constructor(cookieName: string = 'routember') {
+  private cookie: any;
+
+  constructor(cookie: any, cookieName: string = 'routember') {
+    this.cookie = cookie;
     this.cookieName = cookieName;
   }
-  save(url: string): void {
-    if (typeof document !== 'undefined') {
-      document.cookie = `${this.cookieName}=${encodeURIComponent(url)}; path=/;`;
-    }
+
+  async save(url: string): Promise<void> {
+    await this.cookie.set(this.cookieName, url);
   }
-  get(): string | null {
-    if (typeof document !== 'undefined') {
-      const nameEQ = this.cookieName + '=';
-      const cookies = document.cookie.split('; ');
-      for (const c of cookies) {
-        if (c.indexOf(nameEQ) === 0) {
-          const value = c.substring(nameEQ.length);
-          return decodeURIComponent(value);
-        }
-      }
+
+  async get(): Promise<string | null> {
+    const value = await this.cookie.get(this.cookieName);
+    if (typeof value === 'string') {
+      return value;
+    } else if (typeof value === 'object' && value.value) {
+      return value.value;
     }
     return null;
   }
-  clear(): void {
-    if (typeof document !== 'undefined') {
-      document.cookie = `${this.cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+
+  async clear(): Promise<void> {
+    if (typeof this.cookie.delete === 'function') {
+      await this.cookie.delete(this.cookieName);
+    } else if (typeof this.cookie.remove === 'function') {
+      await this.cookie.remove(this.cookieName);
+    } else {
+      throw new Error('Cookie store does not support remove or delete method');
     }
   }
 }
