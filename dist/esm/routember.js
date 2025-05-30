@@ -1,19 +1,30 @@
-import { LocalStorageRouteStore } from './stores';
 const DEFAULT_EXCLUDE_PATHS = ['/login', '/sign-in', '/sign-up', '/signup', '/forgot-password', '/reset-password', '/logout', '/api/'];
-export function useRoutember(store = new LocalStorageRouteStore(), excludePaths = DEFAULT_EXCLUDE_PATHS) {
-    const setRedirectUrl = (url) => {
-        if (excludePaths.some(path => url.includes(path)))
-            return;
-        store.save(url);
+export function useRoutember(store = null, excludePaths = DEFAULT_EXCLUDE_PATHS) {
+    let currentStore = store;
+    const setStore = (store) => {
+        currentStore = store;
     };
-    const getRedirectUrl = () => {
-        const redirectUrl = store.get();
-        store.clear();
+    const setRedirectUrl = async (url) => {
+        if (!currentStore)
+            throw new Error('Store is not set');
+        const strippedUrl = stripUrl(url);
+        if (excludePaths.some(path => strippedUrl.includes(path)))
+            return;
+        await currentStore.save(strippedUrl);
+    };
+    const getRedirectUrl = async () => {
+        if (!currentStore)
+            throw new Error('Store is not set');
+        const redirectUrl = await currentStore.get();
+        await currentStore.clear();
         return redirectUrl;
     };
-    const redirectAfterLogin = (router, defaultUrl = '/') => {
-        const redirectUrl = getRedirectUrl();
+    const redirectRememberedUrl = async (router, defaultUrl = '/') => {
+        const redirectUrl = await getRedirectUrl();
         router.replace(redirectUrl || defaultUrl);
     };
-    return { setRedirectUrl, getRedirectUrl, redirectAfterLogin };
+    const stripUrl = (url) => {
+        return url.replace(/^[^#]*?:\/\/.*?(\/.*)$/, '$1');
+    };
+    return { setStore, setRedirectUrl, getRedirectUrl, redirectRememberedUrl };
 }

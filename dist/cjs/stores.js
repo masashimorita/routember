@@ -1,55 +1,35 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CookieRouteStore = exports.LocalStorageRouteStore = void 0;
-class LocalStorageRouteStore {
-    key;
-    constructor(key = 'routember') {
-        this.key = key;
-    }
-    save(url) {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem(this.key, url);
-        }
-    }
-    get() {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            return localStorage.getItem(this.key);
-        }
-        return null;
-    }
-    clear() {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.removeItem(this.key);
-        }
-    }
-}
-exports.LocalStorageRouteStore = LocalStorageRouteStore;
+exports.CookieRouteStore = void 0;
 class CookieRouteStore {
     cookieName;
-    constructor(cookieName = 'routember') {
+    cookie;
+    constructor(cookie, cookieName = 'routember') {
+        this.cookie = cookie;
         this.cookieName = cookieName;
     }
-    save(url) {
-        if (typeof document !== 'undefined') {
-            document.cookie = `${this.cookieName}=${encodeURIComponent(url)}; path=/;`;
-        }
+    async save(url) {
+        await this.cookie.set(this.cookieName, url);
     }
-    get() {
-        if (typeof document !== 'undefined') {
-            const nameEQ = this.cookieName + '=';
-            const cookies = document.cookie.split('; ');
-            for (const c of cookies) {
-                if (c.indexOf(nameEQ) === 0) {
-                    const value = c.substring(nameEQ.length);
-                    return decodeURIComponent(value);
-                }
-            }
+    async get() {
+        const value = await this.cookie.get(this.cookieName);
+        if (typeof value === 'string') {
+            return value;
+        }
+        else if (typeof value === 'object' && value.value) {
+            return value.value;
         }
         return null;
     }
-    clear() {
-        if (typeof document !== 'undefined') {
-            document.cookie = `${this.cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+    async clear() {
+        if (typeof this.cookie.delete === 'function') {
+            await this.cookie.delete(this.cookieName);
+        }
+        else if (typeof this.cookie.remove === 'function') {
+            await this.cookie.remove(this.cookieName);
+        }
+        else {
+            throw new Error('Cookie store does not support remove or delete method');
         }
     }
 }

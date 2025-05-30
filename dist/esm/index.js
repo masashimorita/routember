@@ -1,2 +1,2 @@
 export { useRoutember } from './routember';
-export { LocalStorageRouteStore, CookieRouteStore } from './stores';
+export { CookieRouteStore } from './stores';

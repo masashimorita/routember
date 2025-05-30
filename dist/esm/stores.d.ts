@@ -1,20 +1,14 @@
 export interface RouteStore {
-    save(url: string): void;
-    get(): string | null;
-    clear(): void;
-}
-export declare class LocalStorageRouteStore implements RouteStore {
-    private key;
-    constructor(key?: string);
-    save(url: string): void;
-    get(): string | null;
-    clear(): void;
+    save(url: string): Promise<void>;
+    get(): Promise<string | null>;
+    clear(): Promise<void>;
 }
 export declare class CookieRouteStore implements RouteStore {
     private cookieName;
-    constructor(cookieName?: string);
-    save(url: string): void;
-    get(): string | null;
-    clear(): void;
+    private cookie;
+    constructor(cookie: any, cookieName?: string);
+    save(url: string): Promise<void>;
+    get(): Promise<string | null>;
+    clear(): Promise<void>;
 }
 //# sourceMappingURL=stores.d.ts.map
