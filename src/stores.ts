@@ -4,29 +4,6 @@ export interface RouteStore {
   clear(): void;
 }
 
-export class LocalStorageRouteStore implements RouteStore {
-  private key: string;
-  constructor(key: string = 'routember') {
-    this.key = key;
-  }
-  save(url: string): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem(this.key, url);
-    }
-  }
-  get(): string | null {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return localStorage.getItem(this.key);
-    }
-    return null;
-  }
-  clear(): void {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem(this.key);
-    }
-  }
-}
-
 export class CookieRouteStore implements RouteStore {
   private cookieName: string;
   constructor(cookieName: string = 'routember') {
