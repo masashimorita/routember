@@ -8,6 +8,13 @@
   "files": [
     "dist"
   ],
+  "license": "MIT",
+  "author": "Masashi Morita",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/masashimorita/routember"
+  },
+  "keywords": ["routember", "redirect", "url", "remember", "redirect-url"],
   "scripts": {
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:cjs": "tsc --project tsconfig.cjs.json",
