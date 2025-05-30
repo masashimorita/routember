@@ -18,14 +18,17 @@ npm install routember
 ```TypeScript
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { useRoutember } from 'routember';
+import { cookies } from 'next/headers';
+import { useRoutember, CookieRouteStore } from 'routember';
 
-export function middleware(request: NextRequest) {
-  const { setRedirectUrl } = useRoutember();
+export async function middleware(request: NextRequest) {
+  const { setStore, setRedirectUrl } = useRoutember();
   const isLoggedIn = !!request.cookies.get('auth_token');
 
   if (!isLoggedIn && !request.nextUrl.pathname.startsWith('/login')) {
     const response = NextResponse.redirect(new URL('/login', request.url));
+    const store = new CookieRouteStore(await cookies());
+    setStore(store);
     setRedirectUrl(request.nextUrl.href);
     return response;
   }
@@ -41,15 +44,17 @@ export const config = {
 2. Redirect after login via hook
 ```TypeScript
 import { useRouter } from 'next/router';
-import { useRoutember } from 'routember';
+import Cookies from 'js-cookie';
+import { useRoutember, CookieRouteStore } from 'routember';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { redirectAfterLogin } = useRoutember();
+  const store = new CookieRouteStore(Cookies);
+  const { redirectRememberedUrl } = useRoutember(store);
 
   const handleLogin = async () => {
     // Process login...
-    redirectAfterLogin(router, '/dashboard');
+    redirectRememberedUrl(router, '/dashboard');
   };
 
   return (
