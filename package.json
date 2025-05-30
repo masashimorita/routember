@@ -14,17 +14,20 @@
     "type": "git",
     "url": "https://github.com/masashimorita/routember"
   },
-  "keywords": ["routember", "redirect", "url", "remember", "redirect-url"],
+  "keywords": [
+    "routember",
+    "redirect",
+    "url",
+    "remember",
+    "redirect-url"
+  ],
   "scripts": {
     "build:esm": "tsc --project tsconfig.esm.json",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "build": "npm run build:esm && npm run build:cjs",
     "prepare": "yarn run build"
   },
-  "peerDependencies": {
-    "next": "^14.0.0",
-    "react": "^18.0.0"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "@types/node": "^22.15.27",
     "typescript": "^5.0.0"
