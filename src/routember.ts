@@ -11,9 +11,11 @@ export function useRoutember(store: RouteStore | null = null, excludePaths: stri
   
   const setRedirectUrl = async (url: string) => {
     if (!currentStore) throw new Error('Store is not set');
-    if (excludePaths.some(path => url.includes(path))) return;
 
-    await currentStore.save(url);
+    const strippedUrl = stripUrl(url);
+    if (excludePaths.some(path => strippedUrl.includes(path))) return;
+
+    await currentStore.save(strippedUrl);
   };
 
   const getRedirectUrl = async () => {
@@ -27,6 +29,10 @@ export function useRoutember(store: RouteStore | null = null, excludePaths: stri
   const redirectRememberedUrl = async (router: any, defaultUrl: string = '/') => {
     const redirectUrl: string | null = await getRedirectUrl();
     router.replace(redirectUrl || defaultUrl);
+  };
+
+  const stripUrl = (url: string) => {
+    return url.replace(/^[^#]*?:\/\/.*?(\/.*)$/, '$1');
   };
 
   return { setStore, setRedirectUrl, getRedirectUrl, redirectRememberedUrl };
